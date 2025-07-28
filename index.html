@@ -794,29 +794,124 @@
     document.addEventListener('DOMContentLoaded', () => {
 
         // ===================================
-        // GEMINI API-POWERED BOT ENGINE
+        // SIMPLE KEYWORD BOT ENGINE (แทน GeminiBot)
         // ===================================
-        class GeminiBot {
-            constructor(systemPrompt) { this.systemPrompt = systemPrompt; this.history = []; }
+        class SimpleBot {
+            constructor(systemPrompt) {
+                this.systemPrompt = systemPrompt;
+                this.history = [];
+            }
             async process(text) {
-                const apiKey = ""; // Canvas will provide the key
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                const chatHistory = [ { role: "user", parts: [{ text: this.systemPrompt }] }, { role: "model", parts: [{ text: "เข้าใจแล้ว พร้อมให้บริการ" }] } ];
-                this.history.forEach(turn => chatHistory.push({ role: turn.role, parts: [{ text: turn.text }] }));
-                chatHistory.push({ role: "user", parts: [{ text }] });
-                const payload = { contents: chatHistory };
-                try {
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (!response.ok) { return "ขออภัยค่ะ ระบบ AI ขัดข้องชั่วคราว กรุณาลองใหม่อีกครั้ง"; }
-                    const result = await response.json();
-                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts) {
-                        const botResponse = result.candidates[0].content.parts[0].text;
-                        this.history.push({ role: "user", text: text });
-                        this.history.push({ role: "model", text: botResponse });
-                        if (this.history.length > 8) { this.history.splice(0, 2); }
-                        return botResponse;
-                    } else { return "ขออภัยค่ะ ไม่สามารถสร้างคำตอบได้ในขณะนี้"; }
-                } catch (error) { return "ขออภัยค่ะ เกิดข้อผิดพลาดในการเชื่อมต่อกับ AI"; }
+                const msg = text.toLowerCase();
+                // --- E-commerce Bot ---
+                if (this.systemPrompt.includes("StyleHub") || this.systemPrompt.includes("e-commerce")) {
+                    if (
+                        msg.includes('อิเล็กทรอนิกส์') ||
+                        msg.includes('สินค้าอิเล็กทรอนิกส์') ||
+                        (msg.includes('หา') && msg.includes('อิเล็กทรอนิกส์'))
+                    ) {
+                        return "ร้านเรามีสินค้าอิเล็กทรอนิกส์มากมาย เช่น หูฟัง ลำโพง สมาร์ทวอทช์ สนใจดูรายละเอียดสินค้าไหนเป็นพิเศษไหมคะ?";
+                    }
+                    if (
+                        msg.includes('สินค้าขายดี') ||
+                        msg.includes('ขายดี') ||
+                        msg.includes('ยอดนิยม')
+                    ) {
+                        return "สินค้าขายดีของเราตอนนี้คือ หูฟังไร้สาย, กระเป๋าแฟชั่น, และสมาร์ทวอทช์ค่ะ";
+                    }
+                    if (
+                        msg.includes('เช็คสถานะ') ||
+                        msg.includes('สถานะออเดอร์') ||
+                        msg.includes('เช็คออเดอร์') ||
+                        msg.includes('ติดตามออเดอร์')
+                    ) {
+                        return "กรุณาส่งหมายเลขออเดอร์ของคุณมาได้เลยค่ะ เดี๋ยวเช็คสถานะให้ค่ะ";
+                    }
+                    if (msg.includes('โปรโมชัน') || msg.includes('promotion')) {
+                        return "ตอนนี้เรามีโปรโมชันลด 10% สำหรับลูกค้าใหม่!";
+                    }
+                    if (msg.includes('สั่งซื้อ') || msg.includes('order')) {
+                        return "สามารถสั่งซื้อได้ทาง LINE หรือเว็บไซต์ของเราเลยค่ะ";
+                    }
+                    if (msg.includes('แนะนำ') || msg.includes('recommend')) {
+                        return "ขอรายละเอียดเพิ่มเติมเกี่ยวกับสิ่งที่ต้องการแนะนำหน่อยค่ะ";
+                    }
+                }
+                // --- Customer Service Bot ---
+                if (this.systemPrompt.includes("ProShop") || this.systemPrompt.includes("บริการลูกค้า")) {
+                    if (
+                        msg.includes('ติดต่อแผนกการเงิน') ||
+                        (msg.includes('ติดต่อ') && msg.includes('การเงิน'))
+                    ) {
+                        return "คุณสามารถติดต่อแผนกการเงินได้ที่ 02-123-4567 ต่อ 2 หรือแอด LINE @proshopfinance";
+                    }
+                    if (
+                        msg.includes('เบอร์โทรบริการลูกค้า') ||
+                        (msg.includes('เบอร์') && msg.includes('บริการลูกค้า'))
+                    ) {
+                        return "เบอร์โทรฝ่ายบริการลูกค้า: 02-123-4567 (ทุกวัน 9:00-18:00 น.)";
+                    }
+                    if (
+                        msg.includes('แจ้งปัญหาสินค้า') ||
+                        (msg.includes('แจ้ง') && msg.includes('ปัญหา'))
+                    ) {
+                        return "กรุณาระบุรายละเอียดปัญหาสินค้า เดี๋ยวเราจะติดต่อกลับโดยเร็วที่สุดครับ";
+                    }
+                    if (msg.includes('โปรโมชัน') || msg.includes('promotion')) {
+                        return "สอบถามโปรโมชันเพิ่มเติมได้ที่ LINE @proshop หรือดูหน้าเว็บไซต์ของเราได้เลยครับ";
+                    }
+                    if (msg.includes('ราคา') || msg.includes('ค่าบริการ')) {
+                        return "ราคาสินค้าแต่ละชิ้นสามารถดูได้ที่เว็บไซต์ หรือสอบถามรุ่นที่สนใจได้เลยครับ";
+                    }
+                }
+                // --- Marketing Assistant Bot ---
+                if (this.systemPrompt.includes("Creative") || this.systemPrompt.includes("นักการตลาด")) {
+                    if (
+                        msg.includes('คิดสโลแกน') ||
+                        (msg.includes('สโลแกน') && msg.includes('คิด'))
+                    ) {
+                        return "สโลแกนตัวอย่าง: 'กาแฟออร์แกนิค สดชื่นทุกเช้า เพื่อคนรักสุขภาพ'";
+                    }
+                    if (
+                        msg.includes('เขียนโพสต์โปรโมท') ||
+                        (msg.includes('โพสต์') && msg.includes('โปรโมท'))
+                    ) {
+                        return "ตัวอย่างโพสต์: 'เริ่มต้นวันใหม่กับกาแฟออร์แกนิคแท้! สั่งซื้อวันนี้รับส่วนลดพิเศษทันที'";
+                    }
+                    if (
+                        msg.includes('หาไอเดียการตลาด') ||
+                        (msg.includes('ไอเดีย') && msg.includes('การตลาด'))
+                    ) {
+                        return "ไอเดีย: จัดกิจกรรมแจกของรางวัลสำหรับลูกค้าที่แชร์โพสต์ของร้านบนโซเชียลมีเดีย";
+                    }
+                    if (msg.includes('แนะนำ') || msg.includes('recommend')) {
+                        return "บอกโจทย์หรือสินค้าที่ต้องการให้แนะนำไอเดียการตลาดได้เลยครับ";
+                    }
+                }
+                // --- Live Chat Widget (PUNN CHATBOT) ---
+                if (this.systemPrompt.includes("PUNN CHATBOT")) {
+                    if (msg.includes('บริการ') || msg.includes('แชทบอท')) {
+                        return "PUNN CHATBOT รับทำแชทบอท AI สำหรับธุรกิจทุกประเภท ปรับแต่งได้ตามความต้องการ";
+                    }
+                    if (msg.includes('ราคา') || msg.includes('ค่าบริการ')) {
+                        return "ราคาขึ้นอยู่กับฟีเจอร์ที่ต้องการ เริ่มต้นที่ 5,000 บาทครับ";
+                    }
+                    if (msg.includes('โปรโมชัน') || msg.includes('promotion')) {
+                        return "สอบถามโปรโมชันล่าสุดได้ที่ LINE @punnchatbot";
+                    }
+                    if (msg.includes('ติดต่อ') || msg.includes('เบอร์')) {
+                        return "สามารถติดต่อเราได้ที่ LINE: @yourlineid หรือโทร 099-999-9999";
+                    }
+                }
+                // --- Common fallback ---
+                if (msg.includes('สวัสดี') || msg.includes('hello')) {
+                    return "สวัสดีครับ! มีอะไรให้ช่วยไหมครับ?";
+                }
+                if (msg.includes('สั่งซื้อ') || msg.includes('order')) {
+                    return "สามารถสั่งซื้อได้ทาง LINE หรือเว็บไซต์ของเราเลยครับ";
+                }
+                // เพิ่มคีย์เวิร์ด/คำตอบอื่นๆ ตามต้องการ
+                return "ขออภัยครับ ยังไม่เข้าใจคำถาม ลองถามใหม่อีกครั้ง หรือสอบถามข้อมูลเพิ่มเติมได้เลยครับ";
             }
         }
 
@@ -1094,7 +1189,8 @@
             const input = cardElement.querySelector('input');
             const chipsContainer = cardElement.querySelector('.suggestion-chips');
             
-            const instance = { bot: new GeminiBot(cardData.systemPrompt), isTyping: false };
+            // เปลี่ยนเป็น SimpleBot
+            const instance = { bot: new SimpleBot(cardData.systemPrompt), isTyping: false };
             
             addMessageToWindow(chatWindow, cardData.welcome, 'bot');
 
@@ -1105,7 +1201,7 @@
                     chip.className = 'chip';
                     chip.textContent = text;
                     chip.onclick = () => { 
-                        if(cardData.id === '3') { input.value = `${text} สำหรับสินค้า "กาแฟออร์แกนิค"`; } 
+                        if(cardData.id === '3') { input.value = `${text} สำหรับสินค้า \"กาแฟออร์แกนิค\"`; } 
                         else { input.value = text; }
                         handleSend(instance, chatWindow, input);
                     };
@@ -1171,8 +1267,9 @@
 
         // Setup the live chat instance
         (function setupLiveChat() {
+            // เปลี่ยนเป็น SimpleBot
             const liveChatInstance = { 
-                bot: new GeminiBot("คุณคือ AI Assistant ของ 'PUNN CHATBOT' ตอบคำถามเกี่ยวกับบริการและราคาอย่างมืออาชีพ"), 
+                bot: new SimpleBot("คุณคือ AI Assistant ของ 'PUNN CHATBOT' ตอบคำถามเกี่ยวกับบริการและราคาอย่างมืออาชีพ"), 
                 isTyping: false 
             };
             const chatWindow = document.getElementById('chat-live');
