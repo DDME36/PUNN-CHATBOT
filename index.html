@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUNN CHATBOT - สร้างแชทบอท AI อัจฉริยะสำหรับธุรกิจคุณ</title>
+    <meta name="description" content="PUNN CHATBOT: บริการสร้างแชทบอท AI อัจฉริยะสำหรับธุรกิจทุกประเภท เพิ่มยอดขาย ลดภาระแอดมิน ขับเคลื่อนด้วย Gemini API ปรึกษาฟรี!">
+    <style>
+        /* --- Global Styles & Fonts --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --bg-dark: #000;
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent-blue: #007aff;
+            --accent-purple: #5856d6;
+            --bubble-bot: #2c2c2e;
+            --bubble-user: var(--accent-blue);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+            --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { 
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1rem; /* Adjusted padding for mobile */
+        }
+        
+        .section-animated {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s var(--ease-out-quart), transform 0.8s var(--ease-out-quart);
+        }
+        .section-animated.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            opacity: 0;
+            animation: fadeInDown 1s var(--ease-out-quart) forwards;
+        }
+        @keyframes fadeInDown { to { opacity: 1; } }
+
+        .nav-logo { font-weight: 700; font-size: 1.1rem; }
+        .nav-cta {
+            background: var(--accent-blue);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: transform 0.3s var(--ease-out-quart);
+        }
+        .nav-cta:hover { transform: scale(1.05); }
+
+        /* --- Hero Section --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+            position: relative;
+            padding: 0 1rem;
+        }
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s var(--ease-out-quart) 0.2s forwards;
+        }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        .hero-headline {
+            font-size: clamp(2.2rem, 8vw, 4.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 0;
+        }
+        .hero-headline .gradient-text {
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .scroll-indicator {
+            cursor: pointer;
+            animation: bounce 2s infinite 1s;
+        }
+        .scroll-indicator svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--text-primary);
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        .scroll-indicator:hover svg {
+            opacity: 1;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* --- Scroll-Telling Section --- */
+        .scroll-magic-container {
+            height: 300vh;
+            position: relative;
+        }
+        .scroll-magic-sticky {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .scroll-text {
+            position: absolute;
+            font-size: clamp(2rem, 10vw, 5rem);
+            font-weight: 600;
+            line-height: 1.2;
+            opacity: 0;
+            transform: translateY(40px) scale(0.9);
+            transition: all 0.8s var(--ease-out-quart);
+            pointer-events: none;
+        }
+        .scroll-text.active {
+            opacity: 1;
+            transform: translateY(0) scale(1.05);
+        }
+        .scroll-text.fade-out {
+            opacity: 0;
+            transform: translateY(-40px) scale(0.9);
+        }
+        .scroll-text-final {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s var(--ease-out-quart);
+        }
+        .scroll-text-final.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .scroll-text-final .text-item {
+            font-size: clamp(2rem, 9vw, 4rem);
+            font-weight: 700;
+            line-height: 1.2;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* --- Animated Chat Showcase Section (REFINED) --- */
+        .showcase {
+            padding: 6rem 0;
+            background: #0a0a0a;
+        }
+        .showcase-chat-container {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            background: #18181a;
+            border-radius: 20px;
+            padding: 1.5rem;
+            height: 450px; 
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .showcase-chat-window {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+        .showcase-chat-window::-webkit-scrollbar { width: 6px; }
+        .showcase-chat-window::-webkit-scrollbar-track { background: transparent; }
+        .showcase-chat-window::-webkit-scrollbar-thumb { background: #555; border-radius: 6px; }
+
+        .showcase .chat-bubble-wrapper {
+            opacity: 0;
+        }
+        .showcase .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2rem;
+            background: var(--accent-blue);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        .showcase-fake-input {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .showcase-fake-input .text-bar {
+            flex-grow: 1;
+            height: 40px;
+            background-color: #333;
+            border-radius: 20px;
+            border: 1px solid #444;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .showcase-fake-input .send-btn {
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .showcase-fake-input .send-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        /* --- Features Section (REFINED ANIMATION) --- */
+        .features {
+            padding: 6rem 0;
+            background-color: #111;
+        }
+        .section-title {
+            text-align: center;
+            font-size: clamp(2rem, 7vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 3rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-card {
+            background: #1c1c1e;
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transform: translateY(30px);
+            opacity: 0;
+            transition: transform 0.6s var(--ease-out-quart), opacity 0.6s var(--ease-out-quart), box-shadow 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(25px) scale(1.03);
+            box-shadow: 0 8px 30px rgba(0, 122, 255, 0.2);
+        }
+        .section-animated.is-visible .feature-card {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .section-animated.is-visible .feature-card:nth-child(2) { transition-delay: 0.15s; }
+        .section-animated.is-visible .feature-card:nth-child(3) { transition-delay: 0.3s; }
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; }
+        .feature-card p { color: var(--text-secondary); line-height: 1.6; }
+        
+        /* --- Demo Section (Carousel) --- */
+        .demo { 
+            padding: 6rem 0;
+            background: #0a0a0a;
+        }
+        .demo-carousel-wrapper {
+            width: 100%;
+            position: relative;
+        }
+        .demo-carousel {
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+        .demo-grid {
+            display: flex;
+            gap: 1.5rem;
+            padding: 0 1rem;
+        }
+        .demo-grid.no-transition {
+            transition: none;
+        }
+        .demo-grid.with-transition {
+            transition: transform 0.6s var(--ease-in-out-cubic);
+        }
+        .demo-card {
+            background: #1c1c1e;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            width: clamp(300px, 85vw, 380px);
+            height: 480px;
+            flex-shrink: 0;
+            transition: transform 0.5s var(--ease-out-quart), opacity 0.5s var(--ease-out-quart), box-shadow 0.5s var(--ease-out-quart);
+            transform: scale(0.85);
+            opacity: 0.6;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+        }
+        .demo-card.active {
+            transform: scale(1);
+            opacity: 1;
+            box-shadow: 0 8px 32px rgba(88, 86, 214, 0.25), 0 4px 16px rgba(0, 122, 255, 0.2);
+        }
+        .demo-header { padding: 1.5rem; background: var(--bubble-bot); }
+        .demo-header h3 { font-size: 1.2rem; }
+        .demo-chat-window-outer {
+            flex-grow: 1;
+            padding: 0 1rem 1rem 1rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .demo-chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: #18181a;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .demo-chat-window::-webkit-scrollbar { width: 6px; }
+        .demo-chat-window::-webkit-scrollbar-track { background: transparent; }
+        .demo-chat-window::-webkit-scrollbar-thumb { background: #555; border-radius: 6px; }
+        
+        .suggestion-chips { padding: 0 1.5rem 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .chip { background: #333; padding: 0.4rem 0.8rem; border-radius: 15px; font-size: 0.8rem; cursor: pointer; transition: background-color 0.2s; }
+        .chip:hover { background: #444; }
+
+        .demo-input-area { padding: 1rem 1.5rem 1.5rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.07); margin-top: auto; }
+        .demo-input-area input {
+            width: 100%;
+            background: #333;
+            border: 1px solid #444;
+            border-radius: 15px;
+            padding: 0.8rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s var(--ease-out-quart);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        .carousel-btn:hover { 
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .carousel-btn.prev { left: -10px; }
+        .carousel-btn.next { right: -10px; }
+
+        /* --- Chat Bubbles (Shared) --- */
+        .chat-bubble-wrapper { display: flex; opacity: 0; transform: translateY(15px); animation: popIn 0.5s var(--ease-out-quart) forwards; }
+        @keyframes popIn { to { opacity: 1; transform: translateY(0); } }
+        .chat-bubble-wrapper.user { justify-content: flex-end; }
+        .chat-bubble-wrapper.bot { justify-content: flex-start; }
+        .chat-bubble { max-width: 80%; padding: 0.8rem 1rem; border-radius: 18px; line-height: 1.5; word-wrap: break-word; }
+        .chat-bubble-wrapper.user .chat-bubble { background: var(--bubble-user); }
+        .chat-bubble-wrapper.bot .chat-bubble { background: var(--bubble-bot); }
+        .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 0.8rem 0; }
+        .typing-dot { width: 6px; height: 6px; background: var(--text-secondary); border-radius: 50%; animation: typing-anim 1.2s infinite; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing-anim { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* --- Minimizing Chat Animation Section (REVERTED) --- */
+        .minimizing-section {
+            height: 100vh;
+            position: relative;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 0 1rem;
+        }
+        .minimizing-title {
+            font-size: clamp(2rem, 7vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .minimizing-subtitle {
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        .animation-stage {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 550px;
+        }
+        .minimizing-chat-anim-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1c1c1e;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transform: scale(0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 1s var(--ease-in-out-cubic), opacity 0.5s var(--ease-in-out-cubic);
+        }
+        .minimizing-chat-anim-container.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .minimizing-chat-anim-container.minimized {
+            transition: all 1.5s var(--ease-in-out-cubic);
+            transform: translate(calc(50vw - 230px), calc(50vh - 305px)) scale(0.15);
+            opacity: 0;
+        }
+        .minimizing-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Pricing/CTA Section (REFINED ANIMATION) --- */
+        .pricing {
+            padding: 6rem 0;
+            text-align: center;
+        }
+        .pricing-box {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            padding: 2.5rem;
+            border-radius: 30px;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.8s var(--ease-out-quart);
+            position: relative;
+            overflow: hidden;
+        }
+        .section-animated.is-visible .pricing-box {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .pricing-box::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: rotate(30deg);
+            opacity: 0;
+            transition: opacity 1s;
+            z-index: 1;
+        }
+        .section-animated.is-visible .pricing-box::after {
+            animation: shine 2.5s 1s;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); opacity: 1; }
+            100% { transform: translateX(100%) rotate(30deg); opacity: 0; }
+        }
+
+        .pricing h2 { font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 1rem; color: white; }
+        .pricing p { font-size: clamp(1rem, 4vw, 1.2rem); margin-bottom: 2rem; color: rgba(255,255,255,0.8); }
+        .price { font-size: clamp(3rem, 12vw, 4rem); font-weight: 800; color: white; margin-bottom: 1rem; }
+        .price span { font-size: 1rem; font-weight: 400; color: rgba(255,255,255,0.8); }
+        
+        .contact-line {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #00c300;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 2rem;
+            position: relative;
+            z-index: 2;
+            animation: breathing 2.5s ease-in-out infinite;
+        }
+        .contact-line:hover {
+            animation-play-state: paused; /* Pause breathing on hover for a different effect */
+            transform: scale(1.05);
+        }
+        .contact-line svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 0.5rem;
+            fill: white;
+        }
+        @keyframes breathing {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- Footer --- */
+        footer { padding: 4rem 0; text-align: center; color: var(--text-secondary); }
+
+        /* --- Live Chat Widget (REFINED) --- */
+        .live-chat-widget {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 1001;
+            transition: opacity 0.4s, transform 0.4s;
+        }
+        .live-chat-widget.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+        }
+        .chat-toggle-btn {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s var(--ease-out-quart), box-shadow 0.3s;
+        }
+        .chat-toggle-btn:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(0,0,0,0.35); }
+        
+        .chat-window {
+            position: absolute;
+            bottom: 75px;
+            right: 0;
+            width: 350px;
+            max-height: 500px;
+            background: #1c1c1e;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform-origin: bottom right;
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s var(--ease-out-quart);
+        }
+        .chat-window.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .chat-window-header {
+            padding: 1rem 1.5rem;
+            background: var(--bubble-bot);
+            flex-shrink: 0;
+        }
+        .chat-window-header h3 { font-size: 1.1rem; }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+            .minimizing-chat-anim-container.minimized {
+                transform: translate(calc(50vw - 80px), calc(50vh - 80px)) scale(0.15);
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">PUNN CHATBOT</div>
+        <a href="#pricing" class="nav-cta">เริ่มต้นโปรเจค</a>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-headline">
+                    แชทบอท AI ที่สร้างมาเพื่อ<br>
+                    <span class="gradient-text">ธุรกิจของคุณโดยเฉพาะ</span>
+                </h1>
+                <div class="scroll-indicator" onclick="document.querySelector('.scroll-magic-container').scrollIntoView({behavior: 'smooth'})">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-magic-container">
+            <div class="scroll-magic-sticky">
+                <p class="scroll-text" id="scroll-text-1">ตอบไว</p>
+                <p class="scroll-text" id="scroll-text-2">ตรงประเด็น</p>
+                <p class="scroll-text" id="scroll-text-3">รู้ใจลูกค้า</p>
+                <div class="scroll-text-final" id="scroll-text-final">
+                    <p class="text-item">ตอบไว</p>
+                    <p class="text-item">ตรงประเด็น</p>
+                    <p class="text-item">รู้ใจลูกค้า</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="showcase section-animated">
+            <div class="container">
+                <h2 class="section-title">สัมผัสประสบการณ์<br>การโต้ตอบที่เหนือกว่า</h2>
+                <div class="showcase-chat-container">
+                    <div class="showcase-chat-window">
+                        <!-- Animated chat will be injected here by JS -->
+                    </div>
+                    <div class="showcase-fake-input">
+                        <div class="text-bar">พิมพ์ข้อความตรงนี้...</div>
+                        <div class="send-btn">
+                            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features section-animated">
+            <div class="container">
+                <h2 class="section-title">ตอบทุกคำถาม<br>เหมือนมีผู้เชี่ยวชาญส่วนตัว</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>✨ ตอบคำถามอัตโนมัติ 24 ชม.</h3>
+                        <p>บอทของเราสามารถตอบคำถามที่พบบ่อย (FAQ) ได้ทันทีตลอด 24 ชั่วโมง ช่วยลดภาระงานของแอดมินและเพิ่มความพึงพอใจให้ลูกค้า</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🧠 แนะนำสินค้าและบริการ</h3>
+                        <p>PUNN CHATBOT สามารถเรียนรู้ข้อมูลสินค้าของคุณ เพื่อแนะนำสินค้าที่ตรงกับความต้องการของลูกค้าแต่ละราย เพิ่มโอกาสในการขายได้อย่างมีประสิทธิภาพ</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>💸 เชื่อมต่อกับระบบของคุณ</h3>
+                        <p>เราสามารถเชื่อมต่อแชทบอทเข้ากับระบบหลังบ้านของคุณได้ เช่น ระบบ CRM หรือสต็อกสินค้า เพื่อให้ข้อมูลที่ real-time และเป็นประโยชน์สูงสุด</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="demo section-animated">
+            <div class="container">
+                <h2 class="section-title">ทดลองคุยกับผู้ช่วย AI<br>สำหรับธุรกิจประเภทต่างๆ</h2>
+            </div>
+            <div class="demo-carousel-wrapper">
+                <button class="carousel-btn prev" id="prev-btn">‹</button>
+                <div class="demo-carousel">
+                    <div class="demo-grid with-transition" id="demo-slider">
+                        <!-- Cards will be dynamically generated by JS -->
+                    </div>
+                </div>
+                <button class="carousel-btn next" id="next-btn">›</button>
+            </div>
+        </section>
+
+        <section class="minimizing-section section-animated">
+            <div class="minimizing-sticky-container">
+                <h2 class="minimizing-title">พร้อมทำงานได้ทุกที่</h2>
+                <p class="minimizing-subtitle">เปลี่ยนหน้าต่างแชทให้เป็น Widget ประจำเว็บของคุณ</p>
+                <div class="animation-stage">
+                    <div class="minimizing-chat-anim-container" id="minimizing-chat-anim">
+                        <div class="minimizing-content">
+                            <div class="demo-header"><h3>💬 คุยกับเราได้เลย</h3></div>
+                            <div class="demo-chat-window-outer">
+                                <div class="demo-chat-window">
+                                    <div class="chat-bubble-wrapper bot" style="opacity:1; transform: none;"><div class="chat-bubble">สวัสดีครับ! สนใจสอบถามเรื่องอะไรครับ?</div></div>
+                                    <div class="chat-bubble-wrapper user" style="opacity:1; transform: none;"><div class="chat-bubble">อยากทราบรายละเอียดแพ็คเกจครับ</div></div>
+                                </div>
+                            </div>
+                            <div class="demo-input-area"><input type="text" placeholder="พิมพ์ข้อความ..." disabled></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="pricing section-animated">
+            <div class="container">
+                <div class="pricing-box">
+                    <h2>พร้อมสร้างผู้ช่วย AI ของคุณแล้วหรือยัง?</h2>
+                    <p>เป็นเจ้าของแชทบอทอัจฉริยะที่ปรับแต่งมาเพื่อธุรกิจของคุณโดยเฉพาะ</p>
+                    <div class="price">฿5,000 <span>/เริ่มต้น</span></div>
+                    <a href="https://line.me/ti/p/YOUR_LINE_ID" target="_blank" class="contact-line">
+                        <svg viewBox="0 0 24 24"><path d="M16.5,8.5c0-0.8-0.7-1.5-1.5-1.5s-1.5,0.7-1.5,1.5s0.7,1.5,1.5,1.5S16.5,9.3,16.5,8.5z M9,8.5C9,7.7,8.3,7,7.5,7 S6,7.7,6,8.5S6.7,10,7.5,10S9,9.3,9,8.5z M12,2C6.5,2,2,6.5,2,12s4.5,10,10,10c5.5,0,10-4.5,10-10S17.5,2,12,2z M17.7,16.1 c-0.4,0-0.8-0.2-1-0.5c-0.2-0.2-0.2-0.5-0.1-0.7c0.4-0.8,0.6-1.8,0.6-2.8c0-2.8-2.2-5-5.1-5h-0.1c-2.8,0-5.1,2.2-5.1,5 c0,1,0.2,1.9,0.6,2.8c0.1,0.2,0,0.5-0.1,0.7c-0.2,0.2-0.5,0.3-0.7,0.1c-0.1,0-0.1-0.1-0.2-0.1c-1.5-1.2-2.4-3-2.4-5 c0-3.9,3.1-7,7-7h0.1c3.9,0,7,3.1,7,7c0,2-0.9,3.8-2.4,5C17.9,16.1,17.8,16.1,17.7,16.1z"></path></svg>
+                        ปรึกษาโปรเจคฟรีผ่าน LINE
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <footer id="contact">
+            <div class="container">
+                <p>&copy; 2024 PUNN CHATBOT. All rights reserved.</p>
+                <p>สร้างและพัฒนาในประเทศไทย</p>
+            </div>
+        </footer>
+    </main>
+
+    <div class="live-chat-widget hidden" id="live-chat-widget">
+        <div class="chat-window" id="live-chat-window">
+            <div class="chat-window-header">
+                <h3>💬 มีคำถาม? คุยกับเราเลย!</h3>
+            </div>
+            <div class="demo-chat-window-outer">
+              <div class="demo-chat-window" id="chat-live"></div>
+            </div>
+            <div class="demo-input-area"><input type="text" id="input-live" placeholder="พิมพ์ข้อความ..."></div>
+        </div>
+        <button class="chat-toggle-btn" id="chat-toggle-btn" title="เปิด/ปิดแชท">💬</button>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // ===================================
+        // GEMINI API-POWERED BOT ENGINE
+        // ===================================
+        class GeminiBot {
+            constructor(systemPrompt) { this.systemPrompt = systemPrompt; this.history = []; }
+            async process(text) {
+                const apiKey = ""; // Canvas will provide the key
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const chatHistory = [ { role: "user", parts: [{ text: this.systemPrompt }] }, { role: "model", parts: [{ text: "เข้าใจแล้ว พร้อมให้บริการ" }] } ];
+                this.history.forEach(turn => chatHistory.push({ role: turn.role, parts: [{ text: turn.text }] }));
+                chatHistory.push({ role: "user", parts: [{ text }] });
+                const payload = { contents: chatHistory };
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) { return "ขออภัยค่ะ ระบบ AI ขัดข้องชั่วคราว กรุณาลองใหม่อีกครั้ง"; }
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts) {
+                        const botResponse = result.candidates[0].content.parts[0].text;
+                        this.history.push({ role: "user", text: text });
+                        this.history.push({ role: "model", text: botResponse });
+                        if (this.history.length > 8) { this.history.splice(0, 2); }
+                        return botResponse;
+                    } else { return "ขออภัยค่ะ ไม่สามารถสร้างคำตอบได้ในขณะนี้"; }
+                } catch (error) { return "ขออภัยค่ะ เกิดข้อผิดพลาดในการเชื่อมต่อกับ AI"; }
+            }
+        }
+
+        // ===================================
+        // SCROLL & ANIMATION OBSERVERS
+        // ===================================
+        const animatedSections = document.querySelectorAll('.section-animated');
+        const sectionObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        animatedSections.forEach(section => sectionObserver.observe(section));
+
+        // ===================================
+        // SCROLL-TELLING ANIMATION
+        // ===================================
+        const scrollContainer = document.querySelector('.scroll-magic-container');
+        if (scrollContainer) {
+            const text1 = document.getElementById('scroll-text-1');
+            const text2 = document.getElementById('scroll-text-2');
+            const text3 = document.getElementById('scroll-text-3');
+            const textFinal = document.getElementById('scroll-text-final');
+
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                const containerTop = scrollContainer.offsetTop;
+                const containerHeight = scrollContainer.clientHeight;
+                
+                if (scrollY < containerTop - window.innerHeight || scrollY > containerTop + containerHeight) return;
+
+                const scrollPercent = (scrollY - containerTop) / (containerHeight - window.innerHeight);
+                
+                [text1, text2, text3].forEach(text => text.classList.remove('active', 'fade-out'));
+                textFinal.classList.remove('active');
+
+                if (scrollPercent <= 0.3) {
+                    text1.classList.add('active');
+                } else if (scrollPercent <= 0.6) {
+                    text2.classList.add('active');
+                    text1.classList.add('fade-out');
+                } else if (scrollPercent <= 0.9) {
+                    text3.classList.add('active');
+                    text2.classList.add('fade-out');
+                } else {
+                    text3.classList.add('fade-out');
+                    textFinal.classList.add('active');
+                }
+            }, { passive: true });
+        }
+
+        // ===================================
+        // ANIMATED CHAT SHOWCASE (FIXED)
+        // ===================================
+        const showcaseEl = document.querySelector('.showcase');
+        if(showcaseEl) {
+            const showcaseObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        runAnimatedShowcase();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            showcaseObserver.observe(showcaseEl);
+        }
+
+        function typeText(element, text, callback) {
+            let i = 0;
+            element.innerHTML = '';
+            const cursor = '<span class="typing-cursor"></span>';
+            element.innerHTML = cursor;
+            const baseDelay = 40;
+
+            const typingInterval = setInterval(() => {
+                if (i < text.length) {
+                    element.innerHTML = text.substring(0, i + 1) + cursor;
+                    i++;
+                } else {
+                    clearInterval(typingInterval);
+                    element.innerHTML = text;
+                    if (callback) setTimeout(callback, 500);
+                }
+            }, baseDelay);
+        }
+
+        function runAnimatedShowcase() {
+            const container = document.querySelector('.showcase-chat-window');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const script = [
+                { type: 'user', text: 'สนใจอยากได้บอทแชทบอทธุรกิจ ต้องทำยังไงบ้าง?' },
+                { type: 'bot', text: 'เรารับทำแชทบอทตามออดอร์เลยครับ ตอบลูกค้าอัตโนมัติ 24 ชม.' },
+                { type: 'user', text: 'สนใจครับ มีโปรโมชั่นอะไรบ้างครับช่วงนี้' },
+                { type: 'bot', text: 'ราคาขึ้นอยู่กับโมเดลและฟีเจอร์ครับ สนใจทักมาคุยรายละเอียดทางได้เลย' }
+            ];
+
+            let delay = 200;
+            script.forEach((step) => {
+                setTimeout(() => {
+                    const wrapper = createBubble(step.text, step.type);
+                    container.appendChild(wrapper);
+                    container.scrollTop = container.scrollHeight;
+                    typeText(wrapper.querySelector('.chat-bubble'), step.text);
+                }, delay);
+                delay += (step.text.length * 40) + 800;
+            });
+        }
+        
+        function createBubble(content, type) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `chat-bubble-wrapper ${type}`;
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble';
+            bubble.innerHTML = content.replace(/\n/g, '<br>');
+            wrapper.appendChild(bubble);
+            return wrapper;
+        }
+
+        // ===================================
+        // DEMO CAROUSEL LOGIC (FIXED)
+        // ===================================
+        const slider = document.getElementById('demo-slider');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        const demoCardsData = [
+            { id: '1', title: '🎧 บอทบริการลูกค้า', systemPrompt: "คุณคือบอทบริการลูกค้าของ 'ProShop' ตอบคำถามอย่างสุภาพและเป็นมิตร", suggestions: ['ติดต่อแผนกการเงิน', 'เบอร์โทรบริการลูกค้า', 'แจ้งปัญหาสินค้า'], welcome: 'สวัสดีครับ! ผมคือบอทบริการลูกค้าจาก ProShop พร้อมให้บริการครับ', placeholder: 'พิมพ์คำถามของคุณ...' },
+            { id: '2', title: '🛒 บอท E-commerce', systemPrompt: "คุณคือ AI Assistant ของร้าน 'StyleHub' เชี่ยวชาญเรื่องแฟชั่นและการแนะนำสินค้า", suggestions: ['หาสินค้าอิเล็กทรอนิกส์', 'สินค้าขายดี', 'เช็คสถานะออเดอร์'], welcome: 'สวัสดีค่ะ! ยินดีต้อนรับสู่ StyleHub สนใจสินค้าประเภทไหนคะ?', placeholder: 'ค้นหาสินค้า...' },
+            { id: '3', title: '✨ ผู้ช่วยนักการตลาด', systemPrompt: "คุณคือ AI Creative Assistant ช่วยคิดไอเดียการตลาดและสโลแกน", suggestions: ['✨ คิดสโลแกนให้หน่อย', '✨ เขียนโพสต์โปรโมท', '✨ หาไอเดียการตลาด'], welcome: 'สวัสดีครับ! ผมคือผู้ช่วยสร้างสรรค์คอนเทนต์ ต้องการให้ผมช่วยอะไรครับ?', placeholder: 'ต้องการให้ช่วยอะไร...' }
+        ];
+
+        if (slider) {
+            const numCards = demoCardsData.length;
+            let currentIndex = numCards;
+            let isTransitioning = false;
+
+            const allSlides = [
+                ...demoCardsData.slice(numCards - 2, numCards), // last two items
+                ...demoCardsData,
+                ...demoCardsData.slice(0, 2) // first two items
+            ].map(data => createDemoCard(data));
+
+            slider.append(...allSlides);
+            
+            function getCardWidth() {
+                const firstCard = slider.querySelector('.demo-card');
+                if (!firstCard) return 0;
+                const gap = parseFloat(window.getComputedStyle(slider).gap) || 0;
+                return firstCard.offsetWidth + gap;
+            }
+
+            function setPosition() {
+                const cardWidth = getCardWidth();
+                const offset = cardWidth * currentIndex;
+                const centeringOffset = (slider.parentElement.offsetWidth / 2) - (cardWidth / 2);
+                slider.style.transform = `translateX(${-offset + centeringOffset}px)`;
+
+                slider.querySelectorAll('.demo-card').forEach(c => c.classList.remove('active'));
+                if (slider.children[currentIndex]) {
+                    slider.children[currentIndex].classList.add('active');
+                }
+            }
+
+            slider.addEventListener('transitionend', () => {
+                isTransitioning = false;
+                if (currentIndex <= 1) {
+                    slider.classList.remove('with-transition');
+                    currentIndex += numCards;
+                    setPosition();
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                           slider.classList.add('with-transition');
+                        });
+                    });
+                }
+                if (currentIndex >= numCards + 2) {
+                    slider.classList.remove('with-transition');
+                    currentIndex -= numCards;
+                    setPosition();
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                           slider.classList.add('with-transition');
+                        });
+                    });
+                }
+            });
+
+            const moveSlider = (direction) => {
+                if (isTransitioning) return;
+                isTransitioning = true;
+                currentIndex += direction;
+                setPosition();
+            };
+
+            prevBtn.addEventListener('click', () => moveSlider(-1));
+            nextBtn.addEventListener('click', () => moveSlider(1));
+
+            window.addEventListener('resize', () => {
+                slider.classList.remove('with-transition');
+                setPosition();
+                slider.classList.add('with-transition');
+            });
+            
+            slider.classList.remove('with-transition');
+            setPosition();
+            setTimeout(() => slider.classList.add('with-transition'), 50);
+        }
+
+        // ===================================
+        // MINIMIZING CHAT ANIMATION (REVERTED & REFINED)
+        // ===================================
+        const minimizingSection = document.querySelector('.minimizing-section');
+        if(minimizingSection) {
+            const animContainer = document.getElementById('minimizing-chat-anim');
+            const liveChatWidget = document.getElementById('live-chat-widget');
+            let hasAnimated = false;
+
+            const minimizingObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !hasAnimated) {
+                        hasAnimated = true; 
+                        liveChatWidget.classList.add('hidden');
+                        
+                        // Sequence of animations
+                        setTimeout(() => {
+                            // 1. Show chat window
+                            animContainer.classList.add('visible');
+                            
+                            setTimeout(() => {
+                                // 2. Minimize chat window
+                                animContainer.classList.add('minimized');
+                                
+                                // 3. When animation finishes, show the real widget
+                                animContainer.addEventListener('transitionend', () => {
+                                    liveChatWidget.classList.remove('hidden');
+                                }, { once: true });
+
+                            }, 3500); // Wait 3.5s before minimizing
+                        }, 800); // Wait 0.8s before showing chat
+                    }
+                });
+            }, { threshold: 0.7 });
+            
+            minimizingObserver.observe(minimizingSection);
+        }
+
+
+        // ===================================
+        // CHAT DEMO LOGIC (SETUP)
+        // ===================================
+        function createDemoCard(cardData) {
+            const card = document.createElement('div');
+            card.className = 'demo-card';
+            card.dataset.id = cardData.id;
+
+            card.innerHTML = `
+                <div class="demo-header"><h3>${cardData.title}</h3></div>
+                <div class="demo-chat-window-outer">
+                    <div class="demo-chat-window"></div>
+                </div>
+                <div class="suggestion-chips"></div>
+                <div class="demo-input-area"><input type="text" placeholder="${cardData.placeholder}"></div>
+            `;
+            setupDemo(card, cardData);
+            return card;
+        }
+
+        function setupDemo(cardElement, cardData) {
+            const chatWindow = cardElement.querySelector('.demo-chat-window');
+            const input = cardElement.querySelector('input');
+            const chipsContainer = cardElement.querySelector('.suggestion-chips');
+            
+            const instance = { bot: new GeminiBot(cardData.systemPrompt), isTyping: false };
+            
+            addMessageToWindow(chatWindow, cardData.welcome, 'bot');
+
+            if (cardData.suggestions && chipsContainer) {
+                chipsContainer.innerHTML = '';
+                cardData.suggestions.forEach(text => {
+                    const chip = document.createElement('div');
+                    chip.className = 'chip';
+                    chip.textContent = text;
+                    chip.onclick = () => { 
+                        if(cardData.id === '3') { input.value = `${text} สำหรับสินค้า "กาแฟออร์แกนิค"`; } 
+                        else { input.value = text; }
+                        handleSend(instance, chatWindow, input);
+                    };
+                    chipsContainer.appendChild(chip);
+                });
+            }
+            
+            input.addEventListener('keypress', (e) => { 
+                if (e.key === 'Enter') handleSend(instance, chatWindow, input); 
+            });
+        }
+
+        async function handleSend(instance, chatWindow, input) {
+            const text = input.value.trim();
+            if (!text || instance.isTyping) return;
+            
+            addMessageToWindow(chatWindow, text, 'user');
+            input.value = '';
+            instance.isTyping = true;
+            
+            const typingIndicator = addMessageToWindow(chatWindow, '', 'typing');
+            
+            const response = await instance.bot.process(text);
+            
+            typingIndicator.remove();
+            addMessageToWindow(chatWindow, response, 'bot');
+            instance.isTyping = false;
+        }
+
+        function addMessageToWindow(win, content, type) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `chat-bubble-wrapper ${type}`;
+            const bubble = document.createElement('div');
+            
+            if (type === 'typing') {
+                bubble.className = 'typing-indicator';
+                bubble.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            } else {
+                bubble.className = 'chat-bubble';
+                bubble.innerHTML = content.replace(/\n/g, '<br>');
+            }
+            
+            wrapper.appendChild(bubble);
+            win.appendChild(wrapper);
+            win.scrollTop = win.scrollHeight;
+            return wrapper;
+        }
+
+
+        // ===================================
+        // LIVE CHAT WIDGET LOGIC
+        // ===================================
+        const liveChatWidget = document.getElementById('live-chat-widget');
+        const toggleBtn = document.getElementById('chat-toggle-btn');
+        const liveChatWindow = document.getElementById('live-chat-window');
+        let isChatOpen = false;
+
+        toggleBtn.addEventListener('click', () => {
+            isChatOpen = !isChatOpen;
+            liveChatWindow.classList.toggle('open', isChatOpen);
+            toggleBtn.innerHTML = isChatOpen ? '&#10005;' : '💬';
+        });
+
+        // Setup the live chat instance
+        (function setupLiveChat() {
+            const liveChatInstance = { 
+                bot: new GeminiBot("คุณคือ AI Assistant ของ 'PUNN CHATBOT' ตอบคำถามเกี่ยวกับบริการและราคาอย่างมืออาชีพ"), 
+                isTyping: false 
+            };
+            const chatWindow = document.getElementById('chat-live');
+            const input = document.getElementById('input-live');
+            
+            addMessageToWindow(chatWindow, 'สวัสดีครับ! มีคำถามเกี่ยวกับบริการของเราไหมครับ?', 'bot');
+            
+            input.addEventListener('keypress', (e) => { 
+                if (e.key === 'Enter') {
+                    handleSend(liveChatInstance, chatWindow, input);
+                }
+            });
+        })();
+
+    });
+    </script>
+</body>
+</html>
